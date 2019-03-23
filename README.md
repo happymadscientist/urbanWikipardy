@@ -1,7 +1,8 @@
 # urbanWikipardy
 Web-based Jeopardy clone sourcing from Urban Dictionary and Wikipedia
 
-![Example game](/game.PNG?raw=true "Example game")
+![Example game](pics/sampleBoard.PNG?raw=true "Example game")
+![Example question](pics/sampleQuestion.PNG?raw=true "Example question")
 
 # Gameplay
 
@@ -14,6 +15,8 @@ At a high level, the game involves teams guessing words from certain categories.
 
 ## Moderator
 The one who controls the game.  They add categories and assign points to teams.  When logging in, the moderator is asked whether to the currency in the game is drinks or dollars, and how many questions to include in each category.
+
+![Mod login](pics/modLogin.PNG?raw=true "Mod Login")
 
 Once logged in, the moderator is presented with a blank game board and a control panel. Teams and categories will appear on the game board as they are added.
 
@@ -28,17 +31,26 @@ These determine how to select questions.
 "In Word" includes words who contain the query in their word (the answer)
 "In Definition" includes words which contain the query in their definition (the question)
 
+![Category select](pics/filterWord.PNG?raw=true "Filter word")
+
 #### Sort options
 These determine how the questions are ranked by difficulty.  Choosing "Upvotes" sorts the results so the easiest question has the most upvotes.  Sorting by "Downvotes" results in the easiest question having the least downvotes.
+
+![Sort options](pics/rankQuestions.PNG?raw=true "Rank questions")
 
 #### Defintion/Example options
 This determines the form of the question.  Choosing "Definition" uses a word's definition as its question.  Choosing "Example" uses a word's example as its question.  Choosing both includes both, and is typically easier.
 
+![Question form](pics/includeAnswer.PNG?raw=true "Question form")
+
 #### Wikipedia Slider
 This determines how many questions in the category to get from Wikipedia.  It will do a seach of the word and return the first two sentences from the top results as the question.
 
+
 #### Adding Teams without Buzzers
 To add a team without a buzzer, type their name in the team box and click "Add Team".  Their name and score will appear in the team window.
+
+![Team add](pics/teamAdd.gif?raw=true "teamAdd")
 
 ## Contestant
 Contestants can log in to a passive game board that they cannot control, but which responds to moderator and buzzer commands.  After clicking the Contestant login button, enter the passphrase the moderator tells you.  From here, category and team updates will appear automatically as they happen.
