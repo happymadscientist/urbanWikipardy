@@ -1,0 +1,8 @@
+@font-face { 
+	font-family: 'gyparody' ;
+	src: 'code/templates/gyparody.ttf' format('truetype');
+}
+
+hello {
+	font-family: 'gyparody';
+}

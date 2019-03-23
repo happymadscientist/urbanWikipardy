@@ -1,0 +1,11 @@
+@font-face { 
+	font-family: gyparody;
+	src: url('gyparody.ttf') format('truetype');
+}
+
+.hello {
+	color : red;
+	font-size: 500%;
+	font-family: "gyparody", Fallback, courier;
+	font-style: italic;
+}
