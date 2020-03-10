@@ -5,7 +5,7 @@ getCurrentTime = lambda : datetime.now().timestamp()
 
 mongoAddress = "localhost"
 
-class urbanDictionaryDatabaseHandler:
+class UrbanDictionaryDatabaseHandler:
 
 	def __init__(self):
 		self.loadUrbanDictDatabase()
@@ -16,6 +16,10 @@ class urbanDictionaryDatabaseHandler:
 		self.urbanDb = mongoClient["urbanDb"]
 
 	def createTables(self):
+		self.urbanDb["DICTIONARY"].create_index(
+			[("DEFINITION",ASCENDING)
+		])
+		
 		self.urbanDb['DICTIONARY'].create_index(
 			[('TAGS',ASCENDING),
 			('DEFINITION',ASCENDING),
@@ -58,9 +62,11 @@ class urbanDictionaryDatabaseHandler:
 				print ("UNKNOWN ERROR CODE!")
 				return 0
 
-
 	def upsertEntryToCollection(self,COLLECTION_NAME,ENTRY,UPDATE):
 		return self.urbanDb[COLLECTION_NAME].update_one(ENTRY, UPDATE, upsert=True)
+
+	def upsertEntriesToCollection(self,COLLECTION_NAME,ENTRIES,UPDATE):
+		return self.urbanDb[COLLECTION_NAME].update_many(ENTRIES, UPDATE, upsert=True)
 
 	def updateListOfEntry(self,COLLECTION_NAME,ENTRY,UPDATE):
 		self.urbanDb[COLLECTION_NAME].update_one(ENTRY, {'$push': UPDATE})
@@ -145,19 +151,19 @@ class urbanDictionaryDatabaseHandler:
 		else:
 			extraCriteria = {}
 
-		if "Tag" in categories:
+		if "tag" in categories:
 			tagCursor = self.findManyEntries("DICTIONARY",
 				{**extraCriteria,**{"TAGS":{"$in":[CRITERIA]},"VIEWED" : 0}},
 				returnCriteria)
 			cursorList.append(tagCursor)
 
-		if "InWord" in categories:
+		if "in word" in categories:
 			wordCursor = self.findManyEntries("DICTIONARY",
 				{**extraCriteria,**{"WORD":{"$regex":"^.*%s.*$" % CRITERIA},"VIEWED" : 0}},
 				returnCriteria)
 			cursorList.append(wordCursor)
 
-		if "InDef" in categories:
+		if "in definition" in categories:
 			defCursor = self.findManyEntries("DICTIONARY",
 				{**extraCriteria,**{"DEFINITION":{"$regex":"^.*%s.*$" % CRITERIA},"VIEWED" : 0}},
 				returnCriteria)
@@ -180,12 +186,15 @@ class urbanDictionaryDatabaseHandler:
 				if INCLUDE_EXAMPLE:	
 					word = nextEntry["WORD"]
 					censoredExample = (nextEntry["EXAMPLE"].lower()).replace(word,"x"*len(word))
-					answer = (nextEntry["DEFINITION"] + "\n\n Example: " + censoredExample)
+					answer = (nextEntry["DEFINITION"] + "<br><br> Example: " + censoredExample)
 					questionAnswerDict = {nextEntry["WORD"]:answer}
 				else: questionAnswerDict = {nextEntry["WORD"]:nextEntry["DEFINITION"]}
 
+				# update the viewed flag for this word/def pair
+				self.updateWordViewed(WORD=nextEntry["WORD"],DEFINITION=nextEntry["DEFINITION"])
+
 				outputList.append(questionAnswerDict)
-	
+
 		# print (outputList)
 		return outputList
 
@@ -214,7 +223,7 @@ class urbanDictionaryDatabaseHandler:
 		return 0
 
 	def updateWordDifficulty(self,WORD,DEFINITION,DIFFICULTY):
-		#updates a wword with the difficulty of it and sets it to has been viewed
+		#updates a word with the difficulty of it and sets it to has been viewed
 		selectionCriteria = {"WORD":WORD,"DEFINITION" : DEFINITION}
 		updateCriteria = {"$set":{"DIFFICULTY" : DIFFICULTY}}
 		return self.upsertEntryToCollection("DICTIONARY",selectionCriteria,updateCriteria)
@@ -272,22 +281,22 @@ class urbanDictionaryDatabaseHandler:
 
 	def generateSessionId(self):
 		#generates an unused random word in the dictionary to use as the session id
-		minSessionIdLen,maxSessionIdLen = 10,20
-		regexFilter = "^[a-zA-Z]{12,20}$"
+		minSessionIdLen,maxSessionIdLen = 7,12
+		regexFilter = "^[a-zA-Z]{7,12}$"
 
 		#get a word that hasn't been a session id before but has been used
 		# (so it can be used as a category by curious players)
 		acceptableWord = self.findOneEntry("DICTIONARY",
-			{"WORD":{"$regex":regexFilter},"VIEWED":1,"SESSION_ID_USED":0},
+			{"SESSION_ID_USED":0,"WORD":{"$regex":regexFilter},"VIEWED":1},
 			{"WORD":1,"_id":0})
 
 		#if none is found, try an unused one
 		if (not acceptableWord):
 			acceptableWord = self.findOneEntry("DICTIONARY",
-				{"WORD":{"$regex":regexFilter},"VIEWED":0,"SESSION_ID_USED" : 0},
+				{"WORD":{"$regex":regexFilter},"VIEWED":0,"SESSION_ID_USED" :{"$lt":1}},
 				{"WORD":1,"_id":0})
 
-			#if one is Still not found, reset all words session ids
+			#if one is STILL not found, reset all words session ids
 			if (not acceptableWord):
 				self.wipeSessionIdFlags()
 
@@ -295,13 +304,13 @@ class urbanDictionaryDatabaseHandler:
 				{"WORD":{"$regex":regexFilter},"VIEWED":0,"SESSION_ID_USED":0},
 				{"WORD":1,"_id":0})
 
-				#if one is STILL not found, just return an "X"
+				#if one is STILL not found (because the database is empty), just return an "X"
 				if (not acceptableWord): return "X"
 
-		#toggle the session_id_used flag and return it
-		selectionCriteria = {"WORD":acceptableWord["WORD"]}
+		#toggle the SESSION_ID_USED flag and return it
+		selectionCriteria = {"WORD":acceptableWord["WORD"],"SESSION_ID_USED":0}
 		updateCriteria = {"$inc" : {"SESSION_ID_USED": 1}}
-		self.upsertEntryToCollection("DICTIONARY",selectionCriteria,updateCriteria)
+		self.upsertEntriesToCollection("DICTIONARY",selectionCriteria,updateCriteria)
 
 		return acceptableWord["WORD"]
 
@@ -317,15 +326,31 @@ class urbanDictionaryDatabaseHandler:
 	def getGameSettings(self,SESSION_ID):
 		return self.findOneEntry("GAME_SETTINGS",
 			{"SESSION_ID":SESSION_ID,},
-			{"QUESTIONS_PER_CATEGORY" : 1,"CURRENCY": 1,"_id":0}
+			{"QUESTIONS_PER_CATEGORY" : 1,"CURRENCY": 1,"NUM_SPECTATORS":1,"TEAMS":1,"_id":0}
 			)
 
 	def postGameSettings(self,SESSION_ID,QUESTIONS_PER_CATEGORY,CURRENCY):
 		self.addEntryToCollection("GAME_SETTINGS",
 			{"SESSION_ID":SESSION_ID,
 			"QUESTIONS_PER_CATEGORY":QUESTIONS_PER_CATEGORY,
-			"CURRENCY":CURRENCY})
+			"CURRENCY":CURRENCY,
+			"NUM_SPECTATORS" : 0,
+			"TEAMS" : []
+			})
 
+	def incrementSpectatorCount(self,SESSION_ID):
+		#updates the number of spectators that have viewed a game
+		selectionCriteria = {"SESSION_ID" : SESSION_ID}
+		updateCriteria = {"$inc":{"NUM_SPECTATORS" : 1}}
+		return self.upsertEntryToCollection("GAME_SETTINGS",selectionCriteria,updateCriteria)
+
+	def addTeamToGame(self,SESSION_ID,TEAM_NAME):
+		selectionCriteria = {
+			"SESSION_ID":SESSION_ID,
+			}
+
+		updateCriteria = {"$push" : {"TEAMS": TEAM_NAME}}
+		self.upsertEntryToCollection("GAME_SETTINGS",selectionCriteria,updateCriteria)
 
 	def addUserEntry(self,ENTRY,SESSION_ID):
 		TIMESTAMP = getCurrentTime()
@@ -350,100 +375,3 @@ class urbanDictionaryDatabaseHandler:
 
 	def closeConnection(self):
 		self.urbanDb.client.close()
-
-
-import time
-
-
-def testUDDH():
-	uDDH = urbanDictionaryDatabaseHandler()
-	# uDDH.wipeSessionIdFlags()
-	# uDDH.createTables()
-	# print (uDDH.findViewedWords())
-	# print (uDDH.findRatedWords())
-
-	# print (uDDH.generateSessionId())
-	# print (uDDH.getRandomEntry())
-	# startTime = time.perf_counter()
-
-	# numTrials = 10
-
-	# for trial in range(numTrials):
-	# 	uDDH.findRandomCategory()
-
-	# uDDH.dropAllCollections()
-
-	# commands = uDDH.getBoardCommands("bootinization")
-	# totalTime = time.perf_counter() - startTime
-	# print (totalTime/numTrials)
-
-	# print (commands)
-
-	# CRITERIA = "tough"
-	# categories = ["InDef","Tag","InWord"]
-
-	# uDDH.findWordsByCriteria(CRITERIA,categories,INCLUDE_EXAMPLE = True,NUM_TO_GET = 5)
-
-	# uDDH.urbanDb.drop_collection("USER_ENTRIES")
-	# uDDH.urbanDb.drop_collection("COMMANDS")
-	
-	# uDDH.createTables()
-
-	# print (uDDH.addWordToDict(
-	# 	WORD = WORD,
-	# 	DEFINITION = DEFINITION,
-	# 	UPVOTES = UPVOTES,
-	# 	DOWNVOTES = DOWNVOTES,
-	# 	DATE = DATE,
-	# 	TAGS = TAGS,
-		# EXAMPLE = "Hello"
-	# 	)
-	# )
-
-	# commandType = "Add Team"
-	# commandData = "Tea"
-	# uDDH.postBoardCommand(COMMAND_TYPE = commandType,COMMAND_DATA = commandData)
-
-	# commandType = "Add Team"
-	# commandData = "Team"
-	# uDDH.postBoardCommand(COMMAND_TYPE = commandType,COMMAND_DATA = commandData)
-
-	# commandType = "Active Team"
-	# commandData = "Team1"
-	# uDDH.postBoardCommand(COMMAND_TYPE = commandType,COMMAND_DATA = commandData)
-
-	# randomCatDict = uDDH.findRandomCategory()
-	# print (randomCatDict)
-	# commandType = "Add Category"
-	# commandData = randomCatDict
-	# uDDH.postBoardCommand(COMMAND_TYPE = commandType,COMMAND_DATA = commandData)
-
-	# commandType = "Start Game"
-	# commandData = ""
-	# uDDH.postBoardCommand(COMMAND_TYPE = commandType,COMMAND_DATA = commandData)
-
-	# commandType = "Select Question"
-	# commandData = 0
-	# uDDH.postBoardCommand(COMMAND_TYPE = commandType,COMMAND_DATA = commandData)
-
-	# commandType = "Update Score"
-	# commandData = {"Tea":500}
-	# uDDH.postBoardCommand(COMMAND_TYPE = commandType,COMMAND_DATA = commandData)
-
-	# commandType = "End Question"
-	# commandData = 0
-	# uDDH.postBoardCommand(COMMAND_TYPE = commandType,COMMAND_DATA = commandData)
-
-	# boardCommands = uDDH.getBoardCommands()
-	# print (boardCommands)
-
-	# print (uDDH.findManyEntries("DICTIONARY",{}).count())
-	# uDDH.dropCollection("GAME_SETTINGS")
-	# uDDH.printAllEntries("DICTIONARY")
-	# uDDH.printAllEntries("COMMANDS")
-
-	uDDH.printAllEntries("COMMANDS")
-
-	uDDH.closeConnection()
-
-# testUDDH()

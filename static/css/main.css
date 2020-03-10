@@ -1,0 +1,457 @@
+@font-face {
+  font-family: "GyparodySmall";
+  src: url('fonts/gyparodySmall.ttf') format("truetype");
+}
+
+@font-face {
+  font-family: "GyparodyBig";
+  src: url('fonts/gyparodyBig.ttf') format("truetype");
+}
+
+body {
+  color: white;
+  background-color: darkblue;
+  margin: 0px;
+  height: 100%;
+}
+
+.body {
+  font-family: GyparodyBig;
+  width: 1000px;
+}
+
+.topMenu {
+  display: table;
+  width:100%;
+  color: white;
+  top: 10px;
+  font-family: GyparodyBig;
+  right: 250px;
+}
+
+.questionContainer {
+  height: 70%;
+}
+.sessionIdMod {
+  font-family: GyparodySmall;
+  display: table-cell;
+}
+
+.menu {
+	display: table-cell;
+}
+
+.loginCode {
+  float: right;
+  width: 70%;
+}
+
+.category-options {
+  display: table;
+  width: 100%;
+  height:20%;
+  font-size:2.5vh;
+}
+
+.category-option{
+  height:20%;
+  display: table-cell;
+  color: gray;
+}
+
+.scorecontrol {
+	display: inline-block;
+	width: 100%;
+}
+
+.moderator-login {
+  width: 300px;
+  top: 40px;
+  right: 250px;
+  position: absolute;
+}
+
+.moderator-gameplay{
+  width: 100%;
+}
+
+.container {
+  font-family: GyparodyBig;
+  background-color: darkblue;
+  max-height: 900px;
+  height:900px;
+}
+
+.gameplay-text{
+  color:black;
+  font-family: GyparodyBig;
+  font-size:20px;
+  text-align: center;
+  display: inline-block;
+}
+
+.gameplay-controls {
+  color:black;
+  font-family: GyparodyBig;
+  font-size:20px;
+}
+
+.sidebar{
+ 	background:rgba(255,255,255,0.5);
+	height: 100%;
+	width: 340px;
+	position: absolute;
+	top: 80px;
+	left: 10px;
+	!important;
+	z-index: 1;
+}
+
+.bar-block{
+  text-align:left;
+  padding:8px 16px
+}
+
+.card{
+  box-shadow:0 2px 5px 0 rgba(0,0,0,0.16);
+}
+
+.welcome {
+	color: white;
+	margin-left: 20px;
+	margin-top: 30px;
+	font-size: 25px;
+}
+
+.gameboard {
+  display: grid;
+  grid-template-columns: repeat( auto-fit, minmax(25px, 1fr) );
+  grid-template-rows: repeat( auto-fill, minmax(100px, 1fr) );
+  height:70%;
+}
+
+.question {
+  color: white;
+  text-align: center;
+  font-size: 2em;
+  vertical-align: middle;
+}
+
+.question.question {
+  height:60%;
+}
+
+.answer {
+  font-size:5vh;
+  height: 20%;
+}
+.question.title{
+  font-size: 3vw;
+  height:10%;
+}
+
+.question.content{
+  height:50%;
+  font-size: 1em;
+}
+
+span {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: normal;
+}
+
+.category-column {
+  color: white;
+  text-align: center;
+	height: 100%;
+	align-items: center;
+	font-size: 3em;
+}
+
+.controls.message{
+	font-color:red;
+
+}
+.category.title{
+  font-size: 3vh;
+  height: 80%;
+}
+
+.gridbtn {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  font-size: 26px;
+ 	font-family: GyparodyBig;
+ 	color: orange;
+	background-color: darkblue;
+  align-items: center;
+}
+
+.gridbtn:hover {
+  color: red;
+}
+
+.scoreboard {
+	margin: 1px;
+	background-color: darkblue;
+	font-family: GyparodyBig;
+	height: 30%;
+  border: 4px solid #000;
+  display: grid;
+	grid-template-columns: repeat( auto-fit, minmax(25px, 1fr) );
+}
+
+.teamContainer {
+  color:black;
+  float: left;
+  width:100%;
+  max-width: 100%;
+  height:100%;
+  position: relative;
+  display: inline-block;
+  margin: auto;
+}
+
+.team {
+  overflow-wrap: break-word;
+	color: white;
+  height: 40%;
+	margin-left: 10px;
+	margin-top: 30px;
+}
+
+.team.remove{
+  color: red;
+  position: absolute;
+  top: -15%;
+  left: 0;
+  cursor: pointer;
+}
+
+.score {
+	color: white;
+	font-size: 1.75em;
+}
+
+.category.remove{
+  float: left;
+}
+
+.scorebutton {
+  width: 45%;
+  height: 15%;
+  display: inline;
+  font-size: 3vh;
+  font-family: GyparodyBig;
+  color: white;
+  margin:0px;
+  padding: 0px;
+  background-color: darkblue;
+}
+
+.controls {
+	font-family: GyparodyBig;
+	width: 500px;
+	color: black;
+}
+
+.controls.big{
+	font-size: 5em;
+}
+
+.radio input[type="radio"] {
+	opacity: 0;
+	position: fixed;
+	width: 0;
+}
+
+.radio input[type="checkbox"] {
+	opacity: 0;
+	position: fixed;
+	width: 0;
+}
+
+.radio label {
+	font-family: GyparodySmall;
+  display: inline-block;
+  background-color: #777;
+  padding: 5px 10px;
+  font-size: 16px;
+  border: 2px solid #444;
+  border-radius: 4px;
+  width: 40%;
+}
+
+.radio.inline{
+	display:inline-block;
+	width: 40%;
+}
+
+.radio input[type="radio"]:checked + label {
+  background-color: #1f618d ;
+  border-color: #4c4;
+}
+
+.radio input[type="checkbox"]:checked + label {
+  background-color: #1f618d ;
+  border-color: #4c4;
+}
+
+.radio input[type="radio"]:focus + label {
+  border: 2px dashed #444;
+}
+.radio input[type="checkbox"]:focus + label {
+  border: 2px dashed #444;
+}
+.radio label:hover {
+	background-color:#476e9e;
+}
+
+input {
+	box-shadow: 
+      inset 0 0 8px  rgba(0,0,0,0.1),
+            0 0 16px rgba(0,0,0,0.1); 
+  padding: 15px;
+ 	font-family: GyparodySmall;
+  /*background: rgba(255,255,255,0.5);*/
+  margin: 0 0 10px 0;
+  height: 10px;
+  font-size: 20px;
+  width: 85%;
+}
+
+.sessionId {
+	width: 250px;
+	margin-left:10%;
+}
+
+.button {
+	box-shadow: 0px 0px 0px 2px #9fb4f2;
+	background:linear-gradient(to bottom, #7892c2 5%, #476e9e 100%);
+	background-color:#7892c2;
+	border-radius:10px;
+	border:1px solid #4e6096;
+	display:inline-block;
+	cursor:pointer;
+	color:#ffffff;
+	font-family: GyparodyBig;
+	font-size:19px;
+	margin: 10px 0px;
+	text-decoration:none;
+	text-shadow:0px 1px 0px #283966;
+	width: 100%;
+}
+
+.button:hover {
+	background:linear-gradient(to bottom, #476e9e 5%, #7892c2 100%);
+	background-color:#476e9e;
+}
+.button:active {
+	position:relative;
+	top:1px;
+}
+
+.slider {
+  -webkit-appearance: none;  /* Override default CSS styles */
+  appearance: none;
+  width: 50%; /* Full-width */
+  height: 25px; /* Specified height */
+  background: #d3d3d3; /* Grey background */
+  outline: none; /* Remove outline */
+  opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+  -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+  transition: opacity .2s;
+}
+
+/* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Override default look */
+  appearance: none;
+  opacity: 0;
+  width: 25px; /* Set a specific slider handle width */
+  height: 25px; /* Slider handle height */
+  background: #4CAF50; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+}
+
+.slider::-moz-range-thumb {
+  width: 25px; /* Set a specific slider handle width */
+  height: 25px; /* Slider handle height */
+  background: #4CAF50; /* Green background */
+  opacity: 0;
+  cursor: pointer; /* Cursor on hover */
+}
+
+.slider.bubble {
+  position: relative; 
+  top: 50px;
+  width: 20px;
+  height: 50px;
+  background-color: red;
+  pointer-events: none;
+  opacity: 1;
+}
+
+.select {
+  position: relative;
+  font-family: GyparodySmall;
+  margin-left:  10%;
+  width: 300px;
+  background: rgba(255,255,255,0.5);
+  font-size: 20px;
+  height: 40px;
+}
+
+select-selected {
+  background-color: DodgerBlue;
+}
+
+/* Style the arrow inside the select element: */
+.select-selected:after {
+  position: absolute;
+  content: "";
+  top: 14px;
+  right: 10px;
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+  border-color: #fff transparent transparent transparent;
+}
+
+/* Point the arrow upwards when the select box is open (active): */
+select-selected.select-arrow-active:after {
+  border-color: transparent transparent #fff transparent;
+  top: 7px;
+}
+
+/* style the items (options), including the selected item: */
+.select-items div,.select-selected {
+  color: #ffffff;
+  padding: 8px 16px;
+  border: 1px solid transparent;
+  font-family: GyparodySmall;
+  border-color: transparent transparent rgba(0, 0, 0, 0.1) transparent;
+  cursor: pointer;
+}
+
+/* Style items (options): */
+.select-items {
+  position: absolute;
+  font-family: GyparodySmall;
+  background-color: DodgerBlue;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 99;
+}
+
+/* Hide the items when the select box is closed: */
+select-hide {
+  display: none;
+}
+
+.select-items div:hover, .same-as-selected {
+  background-color: rgba(0, 0, 0, 0.1);
+} 
